@@ -1,16 +1,13 @@
-cmake_minimum_required(VERSION 3.13...3.20)
+cmake_minimum_required(VERSION 3.0)
 
 project(Quakespasm-Spiked LANGUAGES C)
 
 # mkdir build
 # cd build
-# /Volumes/Storage/Applications/CMake.app/Contents/bin/cmake -GXcode -DCMAKE_PREFIX_PATH=/Volumes/ramdisk/zdoom-macos-deps/prefix -DCMAKE_EXE_LINKER_FLAGS="$(/Volumes/ramdisk/zdoom-macos-deps/prefix/bin/pkg-config --libs sdl2 vorbisfile)" ..
+# /Volumes/Storage/Applications/CMake.app/Contents/bin/cmake -GXcode -DCMAKE_PREFIX_PATH=/Volumes/ramdisk/zdoom-macos-deps/prefix -DCMAKE_EXE_LINKER_FLAGS="$(/Volumes/ramdisk/zdoom-macos-deps/prefix/bin/pkg-config --libs sdl2)" ..
 
 # TODO: add other platforms, Windows and Linux
-# TODO: choose mod library, mikmod or xmp
-# TODO: choose mp3 library, mad or mpg123
 # TODO: choose vorbis library, tremor or vorbis
-# TODO: make third-party library optional if possible
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
@@ -49,7 +46,6 @@ set(QUAKE_SOURCES
 	quakespasm/Quake/image.c
 	quakespasm/Quake/in_sdl.c
 	quakespasm/Quake/keys.c
-	# quakespasm/Quake/lodepng.c
 	quakespasm/Quake/main_sdl.c
 	quakespasm/Quake/mathlib.c
 	quakespasm/Quake/mdfour.c
@@ -59,11 +55,6 @@ set(QUAKE_SOURCES
 	quakespasm/Quake/net_loop.c
 	quakespasm/Quake/net_main.c
 	quakespasm/Quake/net_udp.c
-	# quakespasm/Quake/net_win.c
-	# quakespasm/Quake/net_wins.c
-	# quakespasm/Quake/net_wipx.c
-	# quakespasm/Quake/pl_linux.c
-	# quakespasm/Quake/pl_win.c
 	quakespasm/Quake/pr_cmds.c
 	quakespasm/Quake/pr_edict.c
 	quakespasm/Quake/pr_exec.c
@@ -81,9 +72,7 @@ set(QUAKE_SOURCES
 	quakespasm/Quake/snd_mem.c
 	quakespasm/Quake/snd_mikmod.c
 	quakespasm/Quake/snd_mix.c
-	quakespasm/Quake/snd_mp3.c
 	quakespasm/Quake/snd_mp3tag.c
-	quakespasm/Quake/snd_mpg123.c
 	quakespasm/Quake/snd_opus.c
 	quakespasm/Quake/snd_sdl.c
 	quakespasm/Quake/snd_umx.c
@@ -98,7 +87,6 @@ set(QUAKE_SOURCES
 	quakespasm/Quake/sv_phys.c
 	quakespasm/Quake/sv_user.c
 	quakespasm/Quake/sys_sdl_unix.c
-	# quakespasm/Quake/sys_sdl_win.c
 	quakespasm/Quake/view.c
 	quakespasm/Quake/wad.c
 	quakespasm/Quake/world.c
@@ -136,8 +124,6 @@ set(QUAKE_SOURCES
 	quakespasm/Quake/net_loop.h
 	quakespasm/Quake/net_sys.h
 	quakespasm/Quake/net_udp.h
-	# quakespasm/Quake/net_wins.h
-	# quakespasm/Quake/net_wipx.h
 	quakespasm/Quake/platform.h
 	quakespasm/Quake/pr_comp.h
 	quakespasm/Quake/progdefs.h
@@ -175,7 +161,6 @@ set(QUAKE_SOURCES
 	quakespasm/Quake/world.h
 	quakespasm/Quake/wsaerror.h
 	quakespasm/Quake/zone.h
-	quakespasm/Quake/pl_osx.m
 )
 
 set(MACOS_SOURCES
@@ -191,6 +176,18 @@ set(MACOS_SOURCES
 	quakespasm/MacOSX/ScreenInfo.m
 	quakespasm/MacOSX/SDLApplication.m
 	quakespasm/MacOSX/SDLMain.m
+	quakespasm/Quake/pl_osx.m
+)
+
+set(WINDOWS_SOURCES
+	quakespasm/Quake/net_win.c
+	quakespasm/Quake/net_wins.c
+	quakespasm/Quake/net_wipx.c
+	quakespasm/Quake/pl_linux.c
+	quakespasm/Quake/pl_win.c
+	quakespasm/Quake/sys_sdl_win.c
+	quakespasm/Quake/net_wins.h
+	quakespasm/Quake/net_wipx.h
 )
 
 set(MACOS_RESOURCES
@@ -198,20 +195,11 @@ set(MACOS_RESOURCES
 	quakespasm/MacOSX/English.lproj/Launcher.nib
 )
 
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
-
 add_executable(quakespasm-spiked MACOSX_BUNDLE)
 
 target_compile_definitions(quakespasm-spiked PRIVATE
-	# USE_CODEC_FLAC
-	# USE_CODEC_MIKMOD
-	# USE_CODEC_MP3
-	# USE_CODEC_OPUS
-	USE_CODEC_VORBIS
 	USE_CODEC_UMX
 	USE_CODEC_WAVE
-	USE_SDL2
-	USE_ZLIB
 )
 
 target_include_directories(quakespasm-spiked PRIVATE
@@ -226,20 +214,75 @@ target_sources(quakespasm-spiked PRIVATE
 )
 
 find_package(OpenGL REQUIRED)
-set_property(TARGET OpenGL::GL PROPERTY IMPORTED_GLOBAL TRUE)
-target_link_libraries(quakespasm-spiked PRIVATE OpenGL::GL)
+target_include_directories(quakespasm-spiked PRIVATE "${OPENGL_INCLUDE_DIR}")
+target_link_libraries(quakespasm-spiked PRIVATE "${OPENGL_LIBRARIES}")
 
-find_package(SDL2 REQUIRED)
-target_include_directories(quakespasm-spiked PRIVATE "${SDL2_INCLUDE_DIR}")
-target_link_libraries(quakespasm-spiked PRIVATE "${SDL2_LIBRARY}")
+find_package(FLAC)
+if (FLAC_FOUND)
+	target_compile_definitions(quakespasm-spiked PRIVATE USE_CODEC_FLAC)
+	target_include_directories(quakespasm-spiked PRIVATE "${FLAC_INCLUDE_DIRS}")
+	target_link_libraries(quakespasm-spiked PRIVATE "${FLAC_LIBRARIES}")
+endif()
 
-find_package(Vorbis REQUIRED)
-target_include_directories(quakespasm-spiked PRIVATE "${VORBIS_INCLUDE_DIR}")
-target_link_libraries(quakespasm-spiked PRIVATE "${VORBISFILE_LIBRARY}")
+find_package(MikMod)
+if (MIKMOD_FOUND)
+	target_compile_definitions(quakespasm-spiked PRIVATE USE_CODEC_MIKMOD)
+	target_include_directories(quakespasm-spiked PRIVATE "${MIKMOD_INCLUDE_DIR}")
+	target_link_libraries(quakespasm-spiked PRIVATE "${MIKMOD_LIBRARY}")
+endif()
 
-find_package(ZLIB REQUIRED)
-set_property(TARGET ZLIB::ZLIB PROPERTY IMPORTED_GLOBAL TRUE)
-target_link_libraries(quakespasm-spiked PRIVATE ZLIB::ZLIB)
+find_package(MPG123)
+if (MPG123_FOUND)
+	target_compile_definitions(quakespasm-spiked PRIVATE USE_CODEC_MP3)
+	target_sources(quakespasm-spiked PRIVATE quakespasm/Quake/snd_mpg123.c)
+	target_include_directories(quakespasm-spiked PRIVATE "${MPG123_INCLUDE_DIR}")
+	target_link_libraries(quakespasm-spiked PRIVATE "${MPG123_LIBRARY}")
+else()
+	find_package(LibMad)
+	if (LIBMAD_FOUND)
+		target_compile_definitions(quakespasm-spiked PRIVATE USE_CODEC_MP3)
+		target_sources(quakespasm-spiked PRIVATE quakespasm/Quake/snd_mp3.c)
+		target_include_directories(quakespasm-spiked PRIVATE "${LIBMAD_INCLUDE_DIRS}")
+		target_link_libraries(quakespasm-spiked PRIVATE "${LIBMAD_LIBRARIES}")
+	endif()
+endif()
+
+find_package(Opus)
+if (OPUS_FOUND)
+	target_compile_definitions(quakespasm-spiked PRIVATE USE_CODEC_OPUS)
+	target_include_directories(quakespasm-spiked PRIVATE "${OPUS_INCLUDE_DIRS}")
+	target_link_libraries(quakespasm-spiked PRIVATE "${OPUS_LIBRARIES}")
+endif()
+
+find_package(SDL2)
+if (SDL2_FOUND)
+	target_compile_definitions(quakespasm-spiked PRIVATE USE_SDL2)
+	target_include_directories(quakespasm-spiked PRIVATE "${SDL2_INCLUDE_DIR}")
+	target_link_libraries(quakespasm-spiked PRIVATE "${SDL2_LIBRARY}")
+endif()
+
+find_package(Vorbis)
+if (VORBIS_FOUND)
+	target_compile_definitions(quakespasm-spiked PRIVATE USE_CODEC_VORBIS)
+	target_include_directories(quakespasm-spiked PRIVATE "${VORBIS_INCLUDE_DIRS}")
+	target_link_libraries(quakespasm-spiked PRIVATE "${VORBIS_LIBRARIES}")
+endif()
+
+find_package(XMP)
+if (XMP_FOUND)
+	target_compile_definitions(quakespasm-spiked PRIVATE USE_CODEC_XMP)
+	target_include_directories(quakespasm-spiked PRIVATE "${XMP_INCLUDE_DIR}")
+	target_link_libraries(quakespasm-spiked PRIVATE "${XMP_LIBRARY}")
+endif()
+
+find_package(ZLIB)
+if (ZLIB_FOUND)
+	target_compile_definitions(quakespasm-spiked PRIVATE USE_ZLIB)
+	target_include_directories(quakespasm-spiked PRIVATE "${ZLIB_INCLUDE_DIRS}")
+	target_link_libraries(quakespasm-spiked PRIVATE "${ZLIB_LIBRARIES}")
+endif()
+
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
 
 set_target_properties(quakespasm-spiked PROPERTIES
 	MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/quakespasm/MacOSX/Info.plist"
