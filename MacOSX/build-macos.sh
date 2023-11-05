@@ -2,7 +2,7 @@
 
 ./setup-vcpkg.sh
 
-(xcodebuild -project QuakeSpasm.xcodeproj -target QuakeSpasm-Spiked-SDL2) || exit $?
+(xcodebuild -project QuakeSpasm.xcodeproj -target QuakeSpasm-Spiked-SDL2 -quiet) || exit $?
 
 cat <<EOF > build/Release/Quakespasm-Spiked-Revision.txt
 Git URL:      $(git config --get remote.origin.url)
