@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Install Dependencies
-      run: sudo apt update && sudo apt install libmad0-dev libsdl2-dev libvorbis-dev
+      run: sudo apt update && sudo apt install libmad0-dev libopusfile-dev libsdl2-dev libvorbis-dev
 
     - name: Build ${{ matrix.compiler }}
       run: make --jobs=3 --keep-going --directory=Quake CC=${{ matrix.compiler }} USE_SDL2=1
