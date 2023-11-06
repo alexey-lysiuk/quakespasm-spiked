@@ -19,7 +19,7 @@ jobs:
       run: |
         $vsroot = (Get-VisualStudioInstance).InstallationPath
         $devenv = join-path $vsroot "Common7\IDE\devenv.com"
-        $solution = "Windows/VisualStudio/quakespasm.sln"
-        & $devenv $solution /Upgrade
-        & $devenv $solution /Build "Release|${{ matrix.platform }}"
+        cd Windows/VisualStudio
+        & $devenv quakespasm.sln /Upgrade
+        & $devenv quakespasm.sln /Build /Project quakespasm-sdl2.vcproj "Release|${{ matrix.platform }}"
         if (-not $?) { throw "Build failed" }
