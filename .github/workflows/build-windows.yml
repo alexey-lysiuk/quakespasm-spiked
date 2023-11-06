@@ -21,5 +21,5 @@ jobs:
         $devenv = join-path $vsroot "Common7\IDE\devenv.com"
         cd Windows/VisualStudio
         & $devenv quakespasm.sln /Upgrade
-        & $devenv quakespasm.sln /Build /Project quakespasm-sdl2.vcproj "Release|${{ matrix.platform }}"
+        & $devenv quakespasm.sln /Build "Release|${{ matrix.platform }}" /Project quakespasm-sdl2.vcproj
         if (-not $?) { throw "Build failed" }
