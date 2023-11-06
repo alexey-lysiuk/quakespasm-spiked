@@ -20,6 +20,6 @@ jobs:
         $vsroot = (Get-VisualStudioInstance).InstallationPath
         $devenv = join-path $vsroot "Common7\IDE\devenv.com"
         $solution = "Windows/VisualStudio/quakespasm.sln"
-        Start-Process -Wait -FilePath $devenv -ArgumentList $solution,/Upgrade
-        Start-Process -Wait -FilePath $devenv -ArgumentList $solution,/Build,"Release|${{ matrix.platform }}"
+        & $devenv $solution /Upgrade
+        & $devenv $solution /Build "Release|${{ matrix.platform }}"
         if (-not $?) { throw "Build failed" }
