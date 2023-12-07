@@ -14,9 +14,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Install Dependencies
       run: sudo apt update && sudo apt install libmad0-dev libopusfile-dev libsdl2-dev libvorbis-dev
 
     - name: Build with ${{ matrix.compiler }}
-      run: make --jobs=3 --keep-going --directory=Quake CC=${{ matrix.compiler }} USE_SDL2=1
+      run: |
+        export QSS_CFLAGS="-DQSS_VERSION=$(git describe --always) -DQSS_REVISION=$(git rev-parse HEAD) -DQSS_DATE=$(git log -1 --date=short --format=%cd)"
+        make --jobs=3 --keep-going --directory=Quake CC=${{ matrix.compiler }} USE_SDL2=1
