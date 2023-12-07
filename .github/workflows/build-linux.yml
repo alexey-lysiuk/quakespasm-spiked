@@ -28,4 +28,4 @@ jobs:
       - name: Build with MinGW ${{ matrix.config.target }}
         run: |
           export QSS_CFLAGS="-DQSS_VERSION=$(git describe --always) -DQSS_REVISION=$(git rev-parse HEAD) -DQSS_DATE=$(git log -1 --date=short --format=%cd)"
-          ./Quake/build_cross_${{ matrix.config.target }}-sdl2.sh
+          cd Quake && ./build_cross_${{ matrix.config.target }}-sdl2.sh
