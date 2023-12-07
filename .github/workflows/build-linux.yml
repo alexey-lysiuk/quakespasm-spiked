@@ -10,17 +10,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: ["clang", "gcc"]
+        config:
+          - target: win32
+            package: i686-win32
+
+          - target: win64
+            package: w64-x86-64
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Install Dependencies
-      run: sudo apt update && sudo apt install libmad0-dev libopusfile-dev libsdl2-dev libvorbis-dev
+      - name: Install Dependencies
+        run: sudo apt update && sudo apt install gcc-mingw-w64-${{ matrix.config.package }}
 
-    - name: Build with ${{ matrix.compiler }}
-      run: |
-        export QSS_CFLAGS="-DQSS_VERSION=$(git describe --always) -DQSS_REVISION=$(git rev-parse HEAD) -DQSS_DATE=$(git log -1 --date=short --format=%cd)"
-        make --jobs=3 --keep-going --directory=Quake CC=${{ matrix.compiler }} USE_SDL2=1
+      - name: Build with MinGW ${{ matrix.config.target }}
+        run: |
+          export QSS_CFLAGS="-DQSS_VERSION=$(git describe --always) -DQSS_REVISION=$(git rev-parse HEAD) -DQSS_DATE=$(git log -1 --date=short --format=%cd)"
+          ./Quake/build_cross_${{ matrix.config.target }}-sdl2.sh
