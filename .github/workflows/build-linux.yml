@@ -13,10 +13,12 @@ jobs:
         compiler: ["clang", "gcc"]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Install Dependencies
-      run: sudo apt update && sudo apt install libmad0-dev libopusfile-dev libsdl2-dev libvorbis-dev
+      - name: Install Dependencies
+        run: sudo apt update && sudo apt install libmad0-dev libopusfile-dev libsdl2-dev libvorbis-dev
 
-    - name: Build with ${{ matrix.compiler }}
-      run: make --jobs=3 --keep-going --directory=Quake CC=${{ matrix.compiler }} USE_SDL2=1
+      - name: Build with ${{ matrix.compiler }}
+        run: |
+          export MAKEFLAGS=--jobs=3\ --keep-going
+          make --jobs=3 --keep-going --directory=Quake CC=${{ matrix.compiler }} USE_SDL2=1
