@@ -5,4 +5,4 @@ if [ ! -d "vcpkg" ]; then
     ./vcpkg/bootstrap-vcpkg.sh
 fi
 
-./vcpkg/vcpkg install --overlay-triplets=custom-triplets --triplet=x64-osx-10-9 zlib libogg opus opusfile libvorbis
+./vcpkg/vcpkg install --overlay-triplets=custom-triplets --triplet=x64-osx-10-9 zlib libogg opus opusfile libvorbis vorbisfile
