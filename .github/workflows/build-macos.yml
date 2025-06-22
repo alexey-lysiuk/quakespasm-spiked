@@ -6,9 +6,7 @@ on:
 jobs:
   build:
     name: Build macOS
-    runs-on: macos-12
-    strategy:
-      fail-fast: false
+    runs-on: macos-13
 
     steps:
     - uses: actions/checkout@v4
